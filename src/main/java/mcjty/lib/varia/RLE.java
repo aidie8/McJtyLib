@@ -1,5 +1,8 @@
 package mcjty.lib.varia;
 
+import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.network.codec.StreamCodec;
+
 public class RLE {
 
     private final FastByteArray stream = new FastByteArray();
@@ -10,6 +13,30 @@ public class RLE {
     private int pos;
     private int readcnt;
     private int readvalue;
+
+    public static final StreamCodec<FriendlyByteBuf, RLE> OPTIONAL_STREAM_CODEC = StreamCodec.of(
+            (buf, rle) -> {
+                if (rle == null) {
+                    buf.writeBoolean(false);
+                } else {
+                    buf.writeBoolean(true);
+                    byte[] data = rle.getData();
+                    buf.writeVarInt(data.length);
+                    buf.writeBytes(data);
+                }
+            },
+            buf -> {
+                if (!buf.readBoolean()) {
+                    return null;
+                }
+                int length = buf.readVarInt();
+                byte[] data = new byte[length];
+                buf.readBytes(data);
+                RLE rle = new RLE();
+                rle.setData(data);
+                return rle;
+            }
+    );
 
     public void add(int c) {
         if (prev == -1) {
