@@ -1,12 +1,14 @@
 package mcjty.lib.varia;
 
+import net.minecraft.util.StringRepresentable;
+
 import java.util.Objects;
 
 /**
  * Implement this for an enum with names and descriptions. Used
  * inside gui's for example.
  */
-public interface NamedEnum<T extends NamedEnum> {
+public interface NamedEnum<T extends NamedEnum> extends StringRepresentable {
 
     /// Used for displaying on the combo button
     String getName();
